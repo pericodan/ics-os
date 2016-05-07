@@ -100,9 +100,34 @@ void drawBoard(){
 
 }
 
+void drawInvertedTriangle(int x, int y, int w, int h, int color){
+    int i,j;
+    for (i=y;i<=(y+h);i++)
+       for (j=x+i-y;j<=(x+w)-i+y;j++)
+          write_pixel(j,i,color);
+}
+
 void startGame(){
+    int currentx = 49;
+    char pressed;
     //getNames();
     drawBoard();
+
+    //player1 turns
+    drawInvertedTriangle(49, 30, 10, 20, WHITE);
+    while(1){
+        pressed = getchar();
+        if(pressed==left_key && currentx!=49){
+            drawRectangle(currentx, 30, 10, 8, BLACK);
+            currentx-=35;
+            drawInvertedTriangle(currentx, 30, 10, 20, WHITE);
+        }
+        else if(pressed==right_key && currentx!=259){
+            drawRectangle(currentx, 30, 10, 8, BLACK);
+            currentx+=35;
+            drawInvertedTriangle(currentx, 30, 10, 20, WHITE);
+        }
+    }
 
 }
 
