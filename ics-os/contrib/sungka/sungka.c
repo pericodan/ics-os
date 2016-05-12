@@ -50,7 +50,7 @@ void drawMenu(){
 	write_text("[Esc]Quit",40,140,WHITE,0);
 	write_text("[i]Instructions", 40, 160, WHITE, 0);
 }
-
+/*
 void getNames(){ //with maximum dapat
     int index=41;
     char temp;
@@ -72,7 +72,7 @@ void getNames(){ //with maximum dapat
 
 
 }
-
+*/
 void drawBoard(){
     int x, z;
     char temp[1];
@@ -131,7 +131,8 @@ int moveItems(int player){
         drawBoard();
         for(index=player1_current-1; item>0; index--){
             index = (index+16) % 16;
-            if(index!=8){
+            if(items[index]==-1){}
+            else if(index!=8){
                 item--;
                 items[index] = items[index] + 1;
                 if(item!=0){
@@ -161,7 +162,54 @@ int moveItems(int player){
                     drawBoard();
                     items[index] = 0;
                     item = items[index+((8-index)*2)] + 1;
-                    items[0] = item;
+                    items[0] = item + items[0];
+                    items[index+((8-index)*2)] = 0;
+                    delay(10);
+                    drawBoard();
+                    return 0; // end of turn
+                }
+            }
+        }
+    }
+
+    if(player==2){
+        item = items[player2_current];
+        items[player2_current] = 0;
+        drawBoard();
+        for(index=player2_current-1; item>0; index--){
+            index = (index+16) % 16;
+            if(items[index]==-1){}
+            else if(index!=0){
+                item--;
+                items[index] = items[index] + 1;
+                if(item!=0){
+                    delay(10);
+                    drawBoard();
+                }
+                else if(item==0 && index==8){
+                    delay(10);
+                    drawBoard();
+                    return 1; //the turn does not end
+                }
+                else if(item==0 && items[index]>1){
+                    delay(10);
+                    drawBoard();
+                    item = items[index];
+                    items[index] = 0;
+                    delay(10);
+                    drawBoard();
+                }
+                else if(item==0 && index>0 && index<8){
+                    delay(10);
+                    drawBoard();
+                    return 0; //end of turn
+                }
+                else if(item==0){
+                    delay(10);
+                    drawBoard();
+                    items[index] = 0;
+                    item = items[index+((8-index)*2)] + 1;
+                    items[8] = item + items[8];
                     items[index+((8-index)*2)] = 0;
                     delay(10);
                     drawBoard();
@@ -172,18 +220,59 @@ int moveItems(int player){
     }
 }
 
+int checkIfFinish(){
+    int i=0;
+    for(i=1; i<16; i++){
+        if(i==8) continue;
+        if(items[i]>0) return 1;
+    }
+    return -1;
+}
+
+int checkIfNotEmpty(int a){
+    for(; a<a+7; a++){
+        if(items[a]>0) return 1;
+    }
+    return 0;
+}
+
 void startGame(){
     //int currentx = 49;
+    int i=0;
     char pressed;
     //getNames();
     drawRectangle(0,0,320,220, BLACK);
     drawBoard();
 
     while(1){
+
+        if(checkIfFinish()==-1){
+            //prepare for the next round
+            i=1;
+            while(items[0]>=7){
+                items[i] = 7;
+                items[0] = items[0] - 7;
+                i++;
+            }
+            for(; i<8; i++){
+                items[i]=-1;
+            }
+            i=9;
+            while(items[8]>=7){
+                items[i] = 7;
+                items[8] = items[8] - 7;
+                i++;
+            }
+            for(; i<16; i++){
+                items[i]=-1;
+            }
+            drawBoard();
+        }
         //player1 turns
         printTurn(1);
-        drawInvertedTriangle(49, 30, 10, 20, WHITE);
+        drawInvertedTriangle((player1_current-1)*35+49, 30, 10, 20, WHITE);
         while(1){
+            if (checkIfNotEmpty(1)==-1) break;
             pressed = getchar();
             if(pressed==left_key && player1_current!=1){
                 drawRectangle((player1_current-1)*35+49, 30, 10, 8, BLACK);
@@ -196,15 +285,34 @@ void startGame(){
                 drawInvertedTriangle((player1_current-1)*35+49, 30, 10, 20, WHITE);
             }
             if(pressed==enter){
-                if (moveItems(1)!=1)
+                if (moveItems(1)!=1){
+                    drawRectangle(49, 30, 35*7, 8, BLACK);
                     break;
+                }
             }
         }
         //player2 turns
         printTurn(2);
-        //drawInvertedTriangle(49, 30, 10, 20, WHITE);
+        drawInvertedTriangle((player2_current*-1+15)*35+49, 90, 10, 20, WHITE);
         while(1){
-
+            if (checkIfNotEmpty(8)==-1) break;
+            pressed = getchar();
+            if(pressed==left_key && player2_current!=15){
+                drawRectangle((player2_current*-1+15)*35+49, 90, 10, 8, BLACK);
+                player2_current+=1;
+                drawInvertedTriangle((player2_current*-1+15)*35+49, 90, 10, 20, WHITE);
+            }
+            else if(pressed==right_key && player2_current!=9){
+                drawRectangle((player2_current*-1+15)*35+49, 90, 10, 8, BLACK);
+                player2_current-=1;
+                drawInvertedTriangle((player2_current*-1+15)*35+49, 90, 10, 20, WHITE);
+            }
+            if(pressed==enter){
+                if (moveItems(2)!=1){
+                    drawRectangle(49, 90, 35*7, 8, BLACK);
+                    break;
+                }
+            }
         }
     }
 }
