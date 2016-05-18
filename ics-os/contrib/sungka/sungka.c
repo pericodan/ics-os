@@ -28,8 +28,10 @@ char player1_name[50] = "player1";
 char player2_name[50] = "player2";
 int player1_current = 1;
 int player2_current = 15;
+int game_number = 1;
 
 int items[16] = {0, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7};
+//int items[16] = {57, 1, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0};
 
 /*
     "Erases" the screen given the starting point and the width & height
@@ -46,9 +48,9 @@ void drawMenu(){
     drawRectangle(0,0,320,220, BLACK);
     write_text("SUNGKA",41,41,WHITE,1);
 
-    write_text("[Enter]Start",40,120,WHITE,0);
-	write_text("[Esc]Quit",40,140,WHITE,0);
-	write_text("[i]Instructions", 40, 160, WHITE, 0);
+    write_text("[Enter] Start",40,120,WHITE,0);
+	write_text("[Esc] Quit",40,140,WHITE,0);
+	write_text("[i] Instructions", 40, 160, WHITE, 0);
 }
 /*
 void getNames(){ //with maximum dapat
@@ -129,6 +131,7 @@ int moveItems(int player){
         item = items[player1_current];
         items[player1_current] = 0;
         drawBoard();
+        highlight(player1_current);
         for(index=player1_current-1; item>0; index--){
             index = (index+16) % 16;
             if(items[index]==-1){}
@@ -138,6 +141,7 @@ int moveItems(int player){
                 if(item!=0){
                     delay(10);
                     drawBoard();
+                    highlight(index);
                 }
                 else if(item==0 && index==0){
                     delay(10);
@@ -151,6 +155,7 @@ int moveItems(int player){
                     items[index] = 0;
                     delay(10);
                     drawBoard();
+                    highlight(index);
                 }
                 else if(item==0 && index>=9 && index<16){
                     delay(10);
@@ -160,10 +165,24 @@ int moveItems(int player){
                 else if(item==0){
                     delay(10);
                     drawBoard();
+                    highlight(index);
                     items[index] = 0;
-                    item = items[index+((8-index)*2)] + 1;
-                    items[0] = item + items[0];
-                    items[index+((8-index)*2)] = 0;
+                    if(items[index+((8-index)*2)]!=-1){
+                        item = items[index+((8-index)*2)] + 1;
+                        items[index+((8-index)*2)] = 0;
+                        delay(10);
+                        drawBoard();
+                        highlight(index+((8-index)*2));
+                        items[0] = item + items[0];
+                        delay(10);
+                        drawBoard();
+                        highlight(0);
+                        delay(10);
+                        drawBoard();
+                    }
+                    else{
+                        items[0] = 1 + items[0];
+                    }
                     delay(10);
                     drawBoard();
                     return 0; // end of turn
@@ -176,6 +195,7 @@ int moveItems(int player){
         item = items[player2_current];
         items[player2_current] = 0;
         drawBoard();
+        highlight(player2_current);
         for(index=player2_current-1; item>0; index--){
             index = (index+16) % 16;
             if(items[index]==-1){}
@@ -185,6 +205,7 @@ int moveItems(int player){
                 if(item!=0){
                     delay(10);
                     drawBoard();
+                    highlight(index);
                 }
                 else if(item==0 && index==8){
                     delay(10);
@@ -198,6 +219,7 @@ int moveItems(int player){
                     items[index] = 0;
                     delay(10);
                     drawBoard();
+                    highlight(index);
                 }
                 else if(item==0 && index>0 && index<8){
                     delay(10);
@@ -207,10 +229,24 @@ int moveItems(int player){
                 else if(item==0){
                     delay(10);
                     drawBoard();
+                    highlight(index);
                     items[index] = 0;
-                    item = items[index+((8-index)*2)] + 1;
-                    items[8] = item + items[8];
-                    items[index+((8-index)*2)] = 0;
+                    if(items[index+((8-index)*2)]!=-1){
+                        item = items[index+((8-index)*2)] + 1;
+                        items[index+((8-index)*2)] = 0;
+                        delay(10);
+                        drawBoard();
+                        highlight(index+((8-index)*2));
+                        items[8] = item + items[8];
+                        delay(10);
+                        drawBoard();
+                        highlight(8);
+                        delay(10);
+                        drawBoard();
+                    }
+                    else{
+                        items[8] = 1 + items[8];
+                    }
                     delay(10);
                     drawBoard();
                     return 0; // end of turn
@@ -230,10 +266,35 @@ int checkIfFinish(){
 }
 
 int checkIfNotEmpty(int a){
-    for(; a<a+7; a++){
+    int b = a + 7;
+    for(; a<b; a++){
         if(items[a]>0) return 1;
     }
     return 0;
+}
+
+void highlight(int a){
+    char temp[1];
+    if(a == 0){
+        drawRectangle(4,70,30,20, FLESH);
+        sprintf(temp, "%d", items[0]);
+        write_text(temp,12,75,BLACK,0);
+    }
+    else if(a > 0 && a < 8){
+        drawRectangle(a*35+4,40,30,20, FLESH);
+        sprintf(temp, "%d", items[a]);
+        write_text(temp,a*35+12,45,BLACK,0);
+    }
+    else if ( a == 8 ){
+        drawRectangle(285,70,30,20, FLESH);
+        sprintf(temp, "%d", items[8]);
+        write_text(temp,293,75,BLACK,0);
+    }
+    else {
+        drawRectangle(a*-35+564,100,30,20, FLESH);
+        sprintf(temp, "%d", items[a]);
+        write_text(temp,a*-35+572,105,BLACK,0);
+    }
 }
 
 void startGame(){
@@ -249,30 +310,38 @@ void startGame(){
         if(checkIfFinish()==-1){
             //prepare for the next round
             i=1;
-            while(items[0]>=7){
+            while(items[0]>=7 && i<8){
                 items[i] = 7;
                 items[0] = items[0] - 7;
                 i++;
             }
-            for(; i<8; i++){
+            while(i<8){
+                if(i==8) break;
                 items[i]=-1;
+                i++;
             }
             i=9;
-            while(items[8]>=7){
+            while(items[8]>=7 && i<16){
                 items[i] = 7;
                 items[8] = items[8] - 7;
                 i++;
             }
+
             for(; i<16; i++){
                 items[i]=-1;
             }
+
             drawBoard();
         }
         //player1 turns
         printTurn(1);
         drawInvertedTriangle((player1_current-1)*35+49, 30, 10, 20, WHITE);
+
         while(1){
-            if (checkIfNotEmpty(1)==-1) break;
+            if (checkIfNotEmpty(1)==0) {
+                drawRectangle((player1_current-1)*35+49, 30, 10, 8, BLACK);
+                break;
+            }
             pressed = getchar();
             if(pressed==left_key && player1_current!=1){
                 drawRectangle((player1_current-1)*35+49, 30, 10, 8, BLACK);
@@ -295,7 +364,10 @@ void startGame(){
         printTurn(2);
         drawInvertedTriangle((player2_current*-1+15)*35+49, 90, 10, 20, WHITE);
         while(1){
-            if (checkIfNotEmpty(8)==-1) break;
+            if (checkIfNotEmpty(9)==0) {
+                drawRectangle((player2_current*-1+15)*35+49, 90, 10, 8, BLACK);
+                break;
+            }
             pressed = getchar();
             if(pressed==left_key && player2_current!=15){
                 drawRectangle((player2_current*-1+15)*35+49, 90, 10, 8, BLACK);
@@ -322,14 +394,18 @@ main(){
     set_graphics(VGA_320X200X256);
     drawMenu();
 
-    pressed = (char)getch();
-    //do{
+
+    do{
+        pressed = (char)getch();
         if(pressed==enter){
             startGame();
         }
         else if(pressed=='i'){
             //instruction();
         }
-    //}while(pressed!=quit);
-
+    }while(pressed!=quit);
+    //Return ICS-OS graphics before exiting
+	set_graphics(VGA_TEXT80X25X16);
+	clrscr();
+	exit(0);
 }
