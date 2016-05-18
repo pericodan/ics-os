@@ -30,8 +30,8 @@ int player1_current = 1;
 int player2_current = 15;
 int game_number = 1;
 
-//int items[16] = {0, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7};
-int items[16] = {57, 1, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0};
+int items[16] = {0, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7};
+//int items[16] = {57, 1, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0};
 //int items[16] = {97, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /*
@@ -443,7 +443,7 @@ main(){
 
     do{
         drawMenu();
-        //reinitializeVariables();
+        reinitializeVariables();
         pressed = (char)getch();
         if(pressed==enter){
             startGame();
