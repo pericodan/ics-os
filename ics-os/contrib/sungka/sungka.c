@@ -30,8 +30,9 @@ int player1_current = 1;
 int player2_current = 15;
 int game_number = 1;
 
-int items[16] = {0, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7};
-//int items[16] = {57, 1, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0};
+//int items[16] = {0, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7};
+int items[16] = {57, 1, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0};
+//int items[16] = {97, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /*
     "Erases" the screen given the starting point and the width & height
@@ -52,29 +53,7 @@ void drawMenu(){
 	write_text("[Esc] Quit",40,140,WHITE,0);
 	write_text("[i] Instructions", 40, 160, WHITE, 0);
 }
-/*
-void getNames(){ //with maximum dapat
-    int index=41;
-    char temp;
-    char temp2[10];
 
-    drawRectangle(0,0,320,220, BLACK);
-    write_text("Enter name of player 1",41,41,WHITE,1);
-    write_text("Press Enter to proceed",41,100,WHITE,0);
-
-
-    for(index=41;index<320;index+=10){
-        temp = getchar();
-        sprintf(temp2, "%c", temp);
-        write_text(temp2,index,61,WHITE,0);
-    }
-
-    drawRectangle(0,0,320,220, BLACK);
-    write_text("Enter name of player 2",41,41,WHITE,1);
-
-
-}
-*/
 void drawBoard(){
     int x, z;
     char temp[1];
@@ -86,24 +65,69 @@ void drawBoard(){
 
     z=1;
     for(x=39; x<270; x+=35){
-        drawRectangle(x,40,30,20, BROWN);
-        sprintf(temp, "%d", items[(x-4)/35]);
-        write_text(temp,x+8,45,WHITE,0);
+        if(items[(x-4)/35]!=-1){
+            drawRectangle(x,40,30,20, BROWN);
+            sprintf(temp, "%d", items[(x-4)/35]);
+            write_text(temp,x+8,45,WHITE,0);
+        }
+        else{
+            drawRectangle(x,40,30,20, GRAY);
+        }
 
     }
 
     z=8;
     for(x=39; x<270; x+=35){
-        drawRectangle(x,100,30,20, DARK_BROWN);
-        sprintf(temp, "%d", items[(16-(x-4)/35)]);
-        write_text(temp,x+8,105,WHITE,0);
-
+        if(items[(16-(x-4)/35)]!=-1){
+            drawRectangle(x,100,30,20, DARK_BROWN);
+            sprintf(temp, "%d", items[(16-(x-4)/35)]);
+            write_text(temp,x+8,105,WHITE,0);
+        }
+        else{
+            drawRectangle(x,100,30,20, GRAY);
+        }
     }
 
     drawRectangle(285,70,30,20, DARK_BROWN);
     sprintf(temp, "%d", items[8]);
     write_text(temp,293,75,WHITE,0);
 
+
+}
+
+void drawGameNumber(){
+    char temp2[20];
+    drawRectangle(130,140,90,180, BLACK);
+    sprintf(temp2, "Game %d", game_number);
+    write_text(temp2,130,140,WHITE,1);
+
+    write_text("[a] Move Left",10,160,WHITE,0);
+    write_text("[d] Move Right",150,160,WHITE,0);
+    write_text("[esc] Exit",100,180,WHITE,0);
+}
+
+void highlight(int a){
+    char temp[1];
+    if(a == 0){
+        drawRectangle(4,70,30,20, FLESH);
+        sprintf(temp, "%d", items[0]);
+        write_text(temp,12,75,BLACK,0);
+    }
+    else if(a > 0 && a < 8){
+        drawRectangle(a*35+4,40,30,20, FLESH);
+        sprintf(temp, "%d", items[a]);
+        write_text(temp,a*35+12,45,BLACK,0);
+    }
+    else if ( a == 8 ){
+        drawRectangle(285,70,30,20, FLESH);
+        sprintf(temp, "%d", items[8]);
+        write_text(temp,293,75,BLACK,0);
+    }
+    else {
+        drawRectangle(a*-35+564,100,30,20, FLESH);
+        sprintf(temp, "%d", items[a]);
+        write_text(temp,a*-35+572,105,BLACK,0);
+    }
 }
 
 void drawInvertedTriangle(int x, int y, int w, int h, int color){
@@ -265,36 +289,37 @@ int checkIfFinish(){
     return -1;
 }
 
+int printWinner(int a){
+    drawRectangle(0,0,320,220, BLACK);
+    if(a==1){
+        write_text("Player 1 Won !!!",41,41,WHITE,1);
+    }
+    else if(a==2){
+        write_text("Player 2 Won !!!",41,41,WHITE,1);
+    }
+
+    write_text("Press enter to exit",40,120,WHITE,0);
+
+}
+
+int checkIfWinner(){
+    if(items[0]==98){
+        printWinner(1);
+        return 1;
+    }
+    else if(items[8]==98){
+        printWinner(2);
+        return 1;
+    }
+    return 0;
+}
+
 int checkIfNotEmpty(int a){
     int b = a + 7;
     for(; a<b; a++){
         if(items[a]>0) return 1;
     }
     return 0;
-}
-
-void highlight(int a){
-    char temp[1];
-    if(a == 0){
-        drawRectangle(4,70,30,20, FLESH);
-        sprintf(temp, "%d", items[0]);
-        write_text(temp,12,75,BLACK,0);
-    }
-    else if(a > 0 && a < 8){
-        drawRectangle(a*35+4,40,30,20, FLESH);
-        sprintf(temp, "%d", items[a]);
-        write_text(temp,a*35+12,45,BLACK,0);
-    }
-    else if ( a == 8 ){
-        drawRectangle(285,70,30,20, FLESH);
-        sprintf(temp, "%d", items[8]);
-        write_text(temp,293,75,BLACK,0);
-    }
-    else {
-        drawRectangle(a*-35+564,100,30,20, FLESH);
-        sprintf(temp, "%d", items[a]);
-        write_text(temp,a*-35+572,105,BLACK,0);
-    }
 }
 
 void startGame(){
@@ -304,13 +329,20 @@ void startGame(){
     //getNames();
     drawRectangle(0,0,320,220, BLACK);
     drawBoard();
+    drawGameNumber();
 
     while(1){
-
+        if(checkIfWinner()==1){
+            do{
+                pressed = getchar();
+            }while(pressed!=enter);
+            break;
+        }
         if(checkIfFinish()==-1){
             //prepare for the next round
+            game_number ++;
             i=1;
-            while(items[0]>=7 && i<8){
+            while(items[0]>=7 && i<8 && items[i]!=-1){
                 items[i] = 7;
                 items[0] = items[0] - 7;
                 i++;
@@ -321,7 +353,7 @@ void startGame(){
                 i++;
             }
             i=9;
-            while(items[8]>=7 && i<16){
+            while(items[8]>=7 && i<16 && items[i]!=-1){
                 items[i] = 7;
                 items[8] = items[8] - 7;
                 i++;
@@ -332,6 +364,7 @@ void startGame(){
             }
 
             drawBoard();
+            drawGameNumber();
         }
         //player1 turns
         printTurn(1);
@@ -389,13 +422,28 @@ void startGame(){
     }
 }
 
+void reinitializeVariables(){
+    int a;
+    player1_current = 1;
+    player2_current = 15;
+    game_number = 1;
+
+    for(a=0; a<16; a++){
+        if(a==0 || a==8)
+            items[a]=0;
+        else
+            items[a]=7;
+    }
+
+}
+
 main(){
     char pressed;
     set_graphics(VGA_320X200X256);
-    drawMenu();
-
 
     do{
+        drawMenu();
+        //reinitializeVariables();
         pressed = (char)getch();
         if(pressed==enter){
             startGame();
