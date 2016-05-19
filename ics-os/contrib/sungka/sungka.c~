@@ -466,11 +466,7 @@ char mechanics(char line[][35], int pageNo){
 	write_text(line[2], 30, 180, WHITE, 0); //main menu
 	if(pageNo!=1) write_text(line[0], 155, 180, WHITE, 0); //back
 	if(pageNo!=7) write_text(line[1], 230, 180, WHITE, 0); //next	
-	/*
-		catch kapag nag back, kahit first page, at wala sa options yung back (a),
-		e napindot yung 'a' ni user, dapat magdidisplay lang ulit yung same screen
 	
-	*/
 	pressed = (char)getch();
 	return pressed;
 }
