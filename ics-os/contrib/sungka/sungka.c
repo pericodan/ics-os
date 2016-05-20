@@ -1,3 +1,9 @@
+/*
+    Perico Dan B. Dionisio
+    Coleen Bobilles
+    CMSC 125 ST-2L
+*/
+
 #include "../../sdk/dexsdk.h"
 #include "../../sdk/time.h"
 
